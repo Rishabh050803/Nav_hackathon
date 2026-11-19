@@ -1,0 +1,2971 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "PrepX",
+    "description": "Exam creation and conduction backend",
+    "version": "0.2.0"
+  },
+  "paths": {
+    "/api/exams/generate": {
+      "post": {
+        "tags": [
+          "Exam generation"
+        ],
+        "summary": "Generate Exam",
+        "operationId": "generate_exam_api_exams_generate_post",
+        "parameters": [
+          {
+            "name": "x-exam-api-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Exam-Api-Key"
+            }
+          },
+          {
+            "name": "x-user-id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "exclusiveMinimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-User-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateExam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExamPaper"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/exams/{exam_id}": {
+      "get": {
+        "tags": [
+          "Exam generation"
+        ],
+        "summary": "Get Exam",
+        "operationId": "get_exam_api_exams__exam_id__get",
+        "parameters": [
+          {
+            "name": "exam_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Exam Id"
+            }
+          },
+          {
+            "name": "x-exam-api-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Exam-Api-Key"
+            }
+          },
+          {
+            "name": "x-user-id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "exclusiveMinimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-User-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExamPaper"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/exams/{exam_id}/attempt": {
+      "post": {
+        "tags": [
+          "Exam conduction"
+        ],
+        "summary": "Start Attempt",
+        "operationId": "start_attempt_api_exams__exam_id__attempt_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "exam_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Exam Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttemptView"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/attempts/{attempt_id}": {
+      "get": {
+        "tags": [
+          "Exam conduction"
+        ],
+        "summary": "Get Attempt",
+        "operationId": "get_attempt_api_attempts__attempt_id__get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "attempt_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Attempt Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttemptView"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/attempts/{attempt_id}/questions/{question_id}/answer": {
+      "put": {
+        "tags": [
+          "Exam conduction"
+        ],
+        "summary": "Save Answer",
+        "operationId": "save_answer_api_attempts__attempt_id__questions__question_id__answer_put",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "attempt_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Attempt Id"
+            }
+          },
+          {
+            "name": "question_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Question Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnswerRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttemptView"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/attempts/{attempt_id}/questions/{question_id}/visit": {
+      "post": {
+        "tags": [
+          "Exam conduction"
+        ],
+        "summary": "Visit Question",
+        "operationId": "visit_question_api_attempts__attempt_id__questions__question_id__visit_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "attempt_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Attempt Id"
+            }
+          },
+          {
+            "name": "question_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Question Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Versioned"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttemptView"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/attempts/{attempt_id}/questions/{question_id}/review": {
+      "put": {
+        "tags": [
+          "Exam conduction"
+        ],
+        "summary": "Mark Review",
+        "operationId": "mark_review_api_attempts__attempt_id__questions__question_id__review_put",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "attempt_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Attempt Id"
+            }
+          },
+          {
+            "name": "question_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Question Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReviewRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttemptView"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/attempts/{attempt_id}/pause": {
+      "post": {
+        "tags": [
+          "Exam conduction"
+        ],
+        "summary": "Pause",
+        "operationId": "pause_api_attempts__attempt_id__pause_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "attempt_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Attempt Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Versioned"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttemptView"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/attempts/{attempt_id}/resume": {
+      "post": {
+        "tags": [
+          "Exam conduction"
+        ],
+        "summary": "Resume",
+        "operationId": "resume_api_attempts__attempt_id__resume_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "attempt_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Attempt Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Versioned"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttemptView"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/attempts/{attempt_id}/submit": {
+      "post": {
+        "tags": [
+          "Exam conduction"
+        ],
+        "summary": "Submit",
+        "operationId": "submit_api_attempts__attempt_id__submit_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "attempt_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Attempt Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Versioned"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttemptView"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/attempts/{attempt_id}/heartbeat": {
+      "post": {
+        "tags": [
+          "Exam conduction"
+        ],
+        "summary": "Heartbeat",
+        "operationId": "heartbeat_api_attempts__attempt_id__heartbeat_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "attempt_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Attempt Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Versioned"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttemptView"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/attempts/{attempt_id}/evaluation": {
+      "get": {
+        "tags": [
+          "Exam evaluation"
+        ],
+        "summary": "Get Evaluation",
+        "operationId": "get_evaluation_api_attempts__attempt_id__evaluation_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "attempt_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Attempt Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvaluationView"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/attempts/{attempt_id}/analysis": {
+      "get": {
+        "tags": [
+          "Exam analysis"
+        ],
+        "summary": "Get Analysis",
+        "operationId": "get_analysis_api_attempts__attempt_id__analysis_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "attempt_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Attempt Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisView"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/analysis/performance": {
+      "get": {
+        "tags": [
+          "Exam analysis"
+        ],
+        "summary": "Get Performance",
+        "description": "Submitted exam history and deterministic performance statistics.",
+        "operationId": "get_performance_api_analysis_performance_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PerformanceView"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/analysis/suggestions": {
+      "post": {
+        "tags": [
+          "Exam analysis"
+        ],
+        "summary": "Get Suggestions",
+        "description": "Request AI coaching; return labelled rule-based advice on model failure.",
+        "operationId": "get_suggestions_api_analysis_suggestions_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuggestionsView"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AnalysisQuestion": {
+        "properties": {
+          "question_id": {
+            "type": "integer",
+            "title": "Question Id"
+          },
+          "source_question_id": {
+            "type": "integer",
+            "title": "Source Question Id"
+          },
+          "position": {
+            "type": "integer",
+            "title": "Position"
+          },
+          "question_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Question Text"
+          },
+          "topic": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Topic"
+          },
+          "difficulty": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Difficulty"
+          },
+          "selected_option_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Selected Option Id"
+          },
+          "correct_option_ids": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Correct Option Ids"
+          },
+          "is_correct": {
+            "type": "boolean",
+            "title": "Is Correct"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "correct",
+              "incorrect",
+              "unattempted"
+            ],
+            "title": "Status"
+          },
+          "options": {
+            "items": {
+              "$ref": "#/components/schemas/OptionView"
+            },
+            "type": "array",
+            "title": "Options"
+          },
+          "time_spent_ms": {
+            "type": "integer",
+            "title": "Time Spent Ms"
+          },
+          "visit_count": {
+            "type": "integer",
+            "title": "Visit Count"
+          },
+          "answer_change_count": {
+            "type": "integer",
+            "title": "Answer Change Count"
+          },
+          "marked_for_review": {
+            "type": "boolean",
+            "title": "Marked For Review"
+          }
+        },
+        "type": "object",
+        "required": [
+          "question_id",
+          "source_question_id",
+          "position",
+          "question_text",
+          "topic",
+          "difficulty",
+          "selected_option_id",
+          "correct_option_ids",
+          "is_correct",
+          "status",
+          "options",
+          "time_spent_ms",
+          "visit_count",
+          "answer_change_count",
+          "marked_for_review"
+        ],
+        "title": "AnalysisQuestion"
+      },
+      "AnalysisView": {
+        "properties": {
+          "total_questions": {
+            "type": "integer",
+            "title": "Total Questions"
+          },
+          "answered_count": {
+            "type": "integer",
+            "title": "Answered Count"
+          },
+          "correct_count": {
+            "type": "integer",
+            "title": "Correct Count"
+          },
+          "incorrect_count": {
+            "type": "integer",
+            "title": "Incorrect Count"
+          },
+          "unattempted_count": {
+            "type": "integer",
+            "title": "Unattempted Count"
+          },
+          "score_percent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score Percent"
+          },
+          "accuracy_percent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accuracy Percent"
+          },
+          "total_time_spent_ms": {
+            "type": "integer",
+            "title": "Total Time Spent Ms"
+          },
+          "attempt_id": {
+            "type": "integer",
+            "title": "Attempt Id"
+          },
+          "questions": {
+            "items": {
+              "$ref": "#/components/schemas/AnalysisQuestion"
+            },
+            "type": "array",
+            "title": "Questions"
+          },
+          "topics": {
+            "items": {
+              "$ref": "#/components/schemas/TopicBreakdown"
+            },
+            "type": "array",
+            "title": "Topics"
+          },
+          "strong_topics": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Strong Topics"
+          },
+          "weak_topics": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Weak Topics"
+          },
+          "by_difficulty": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/Summary"
+            },
+            "type": "object",
+            "title": "By Difficulty"
+          },
+          "average_time_spent_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Average Time Spent Ms"
+          },
+          "unvisited_count": {
+            "type": "integer",
+            "title": "Unvisited Count"
+          },
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/EventView"
+            },
+            "type": "array",
+            "title": "Events"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_questions",
+          "answered_count",
+          "correct_count",
+          "incorrect_count",
+          "unattempted_count",
+          "score_percent",
+          "accuracy_percent",
+          "total_time_spent_ms",
+          "attempt_id",
+          "questions",
+          "topics",
+          "strong_topics",
+          "weak_topics",
+          "by_difficulty",
+          "average_time_spent_ms",
+          "unvisited_count",
+          "events"
+        ],
+        "title": "AnalysisView"
+      },
+      "AnswerRequest": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Version"
+          },
+          "option_id": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Option Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "version",
+          "option_id"
+        ],
+        "title": "AnswerRequest"
+      },
+      "AttemptView": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "exam_id": {
+            "type": "integer",
+            "title": "Exam Id"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "running",
+              "paused",
+              "submitted"
+            ],
+            "title": "Status"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "server_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Server Time"
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Started At"
+          },
+          "deadline": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deadline"
+          },
+          "pause_expires_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pause Expires At"
+          },
+          "remaining_seconds": {
+            "type": "integer",
+            "title": "Remaining Seconds"
+          },
+          "duration_seconds": {
+            "type": "integer",
+            "title": "Duration Seconds"
+          },
+          "submitted_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Submitted At"
+          },
+          "submission_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Submission Reason"
+          },
+          "active_question_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Active Question Id"
+          },
+          "answered_count": {
+            "type": "integer",
+            "title": "Answered Count"
+          },
+          "questions": {
+            "items": {
+              "$ref": "#/components/schemas/QuestionView"
+            },
+            "type": "array",
+            "title": "Questions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "exam_id",
+          "title",
+          "status",
+          "version",
+          "server_time",
+          "started_at",
+          "deadline",
+          "pause_expires_at",
+          "remaining_seconds",
+          "duration_seconds",
+          "submitted_at",
+          "submission_reason",
+          "active_question_id",
+          "answered_count",
+          "questions"
+        ],
+        "title": "AttemptView"
+      },
+      "CoachingAdvice": {
+        "properties": {
+          "overall_assessment": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Overall Assessment"
+          },
+          "recommendations": {
+            "items": {
+              "$ref": "#/components/schemas/Recommendation"
+            },
+            "type": "array",
+            "maxItems": 10,
+            "minItems": 1,
+            "title": "Recommendations"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "overall_assessment",
+          "recommendations"
+        ],
+        "title": "CoachingAdvice"
+      },
+      "DifficultyCounts": {
+        "properties": {
+          "easy": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Easy",
+            "default": 0
+          },
+          "medium": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Medium",
+            "default": 0
+          },
+          "hard": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Hard",
+            "default": 0
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "DifficultyCounts"
+      },
+      "DifficultyHistory": {
+        "properties": {
+          "total_questions": {
+            "type": "integer",
+            "title": "Total Questions"
+          },
+          "answered_count": {
+            "type": "integer",
+            "title": "Answered Count"
+          },
+          "correct_count": {
+            "type": "integer",
+            "title": "Correct Count"
+          },
+          "incorrect_count": {
+            "type": "integer",
+            "title": "Incorrect Count"
+          },
+          "unattempted_count": {
+            "type": "integer",
+            "title": "Unattempted Count"
+          },
+          "score_percent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score Percent"
+          },
+          "accuracy_percent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accuracy Percent"
+          },
+          "total_time_spent_ms": {
+            "type": "integer",
+            "title": "Total Time Spent Ms"
+          },
+          "completion_percent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completion Percent"
+          },
+          "average_time_spent_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Average Time Spent Ms"
+          },
+          "accuracy_interval_95": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accuracy Interval 95"
+          },
+          "exam_count": {
+            "type": "integer",
+            "title": "Exam Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_questions",
+          "answered_count",
+          "correct_count",
+          "incorrect_count",
+          "unattempted_count",
+          "score_percent",
+          "accuracy_percent",
+          "total_time_spent_ms",
+          "completion_percent",
+          "average_time_spent_ms",
+          "accuracy_interval_95",
+          "exam_count"
+        ],
+        "title": "DifficultyHistory"
+      },
+      "EvaluationView": {
+        "properties": {
+          "total_questions": {
+            "type": "integer",
+            "title": "Total Questions"
+          },
+          "answered_count": {
+            "type": "integer",
+            "title": "Answered Count"
+          },
+          "correct_count": {
+            "type": "integer",
+            "title": "Correct Count"
+          },
+          "incorrect_count": {
+            "type": "integer",
+            "title": "Incorrect Count"
+          },
+          "unattempted_count": {
+            "type": "integer",
+            "title": "Unattempted Count"
+          },
+          "score_percent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score Percent"
+          },
+          "accuracy_percent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accuracy Percent"
+          },
+          "total_time_spent_ms": {
+            "type": "integer",
+            "title": "Total Time Spent Ms"
+          },
+          "attempt_id": {
+            "type": "integer",
+            "title": "Attempt Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_questions",
+          "answered_count",
+          "correct_count",
+          "incorrect_count",
+          "unattempted_count",
+          "score_percent",
+          "accuracy_percent",
+          "total_time_spent_ms",
+          "attempt_id"
+        ],
+        "title": "EvaluationView"
+      },
+      "EventView": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "occurred_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Occurred At"
+          },
+          "question_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Question Id"
+          },
+          "details": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Details"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "occurred_at",
+          "question_id",
+          "details"
+        ],
+        "title": "EventView"
+      },
+      "ExamHistoryItem": {
+        "properties": {
+          "total_questions": {
+            "type": "integer",
+            "title": "Total Questions"
+          },
+          "answered_count": {
+            "type": "integer",
+            "title": "Answered Count"
+          },
+          "correct_count": {
+            "type": "integer",
+            "title": "Correct Count"
+          },
+          "incorrect_count": {
+            "type": "integer",
+            "title": "Incorrect Count"
+          },
+          "unattempted_count": {
+            "type": "integer",
+            "title": "Unattempted Count"
+          },
+          "score_percent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score Percent"
+          },
+          "accuracy_percent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accuracy Percent"
+          },
+          "total_time_spent_ms": {
+            "type": "integer",
+            "title": "Total Time Spent Ms"
+          },
+          "completion_percent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completion Percent"
+          },
+          "average_time_spent_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Average Time Spent Ms"
+          },
+          "accuracy_interval_95": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accuracy Interval 95"
+          },
+          "attempt_id": {
+            "type": "integer",
+            "title": "Attempt Id"
+          },
+          "exam_id": {
+            "type": "integer",
+            "title": "Exam Id"
+          },
+          "submitted_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Submitted At"
+          },
+          "submission_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Submission Reason"
+          },
+          "duration_seconds": {
+            "type": "integer",
+            "title": "Duration Seconds"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_questions",
+          "answered_count",
+          "correct_count",
+          "incorrect_count",
+          "unattempted_count",
+          "score_percent",
+          "accuracy_percent",
+          "total_time_spent_ms",
+          "completion_percent",
+          "average_time_spent_ms",
+          "accuracy_interval_95",
+          "attempt_id",
+          "exam_id",
+          "submitted_at",
+          "submission_reason",
+          "duration_seconds"
+        ],
+        "title": "ExamHistoryItem"
+      },
+      "ExamPaper": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "question_count": {
+            "type": "integer",
+            "title": "Question Count"
+          },
+          "per_question_time_seconds": {
+            "type": "integer",
+            "title": "Per Question Time Seconds"
+          },
+          "total_time_seconds": {
+            "type": "integer",
+            "title": "Total Time Seconds"
+          },
+          "difficulty_counts": {
+            "$ref": "#/components/schemas/DifficultyCounts"
+          },
+          "important_topics": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Important Topics"
+          },
+          "generated_question_count": {
+            "type": "integer",
+            "title": "Generated Question Count"
+          },
+          "pdf_upload_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pdf Upload Id"
+          },
+          "questions": {
+            "items": {
+              "$ref": "#/components/schemas/PaperQuestion"
+            },
+            "type": "array",
+            "title": "Questions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "created_at",
+          "question_count",
+          "per_question_time_seconds",
+          "total_time_seconds",
+          "difficulty_counts",
+          "important_topics",
+          "generated_question_count",
+          "pdf_upload_id",
+          "questions"
+        ],
+        "title": "ExamPaper"
+      },
+      "Finding": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "topic": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Topic"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "category",
+          "topic",
+          "message"
+        ],
+        "title": "Finding"
+      },
+      "GenerateExam": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Title",
+            "default": "Practice exam"
+          },
+          "question_count": {
+            "type": "integer",
+            "maximum": 100.0,
+            "minimum": 1.0,
+            "title": "Question Count"
+          },
+          "per_question_time_seconds": {
+            "type": "integer",
+            "maximum": 3600.0,
+            "minimum": 1.0,
+            "title": "Per Question Time Seconds"
+          },
+          "difficulty": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "easy",
+                  "medium",
+                  "hard"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Difficulty"
+          },
+          "difficulty_counts": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DifficultyCounts"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "important_topics": {
+            "items": {
+              "type": "string",
+              "maxLength": 255,
+              "minLength": 1
+            },
+            "type": "array",
+            "maxItems": 20,
+            "title": "Important Topics"
+          },
+          "generated_question_count": {
+            "type": "integer",
+            "maximum": 20.0,
+            "minimum": 0.0,
+            "title": "Generated Question Count",
+            "default": 0
+          },
+          "pdf_upload_id": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pdf Upload Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "question_count",
+          "per_question_time_seconds"
+        ],
+        "title": "GenerateExam"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "HistoryMetrics": {
+        "properties": {
+          "total_questions": {
+            "type": "integer",
+            "title": "Total Questions"
+          },
+          "answered_count": {
+            "type": "integer",
+            "title": "Answered Count"
+          },
+          "correct_count": {
+            "type": "integer",
+            "title": "Correct Count"
+          },
+          "incorrect_count": {
+            "type": "integer",
+            "title": "Incorrect Count"
+          },
+          "unattempted_count": {
+            "type": "integer",
+            "title": "Unattempted Count"
+          },
+          "score_percent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score Percent"
+          },
+          "accuracy_percent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accuracy Percent"
+          },
+          "total_time_spent_ms": {
+            "type": "integer",
+            "title": "Total Time Spent Ms"
+          },
+          "completion_percent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completion Percent"
+          },
+          "average_time_spent_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Average Time Spent Ms"
+          },
+          "accuracy_interval_95": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accuracy Interval 95"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_questions",
+          "answered_count",
+          "correct_count",
+          "incorrect_count",
+          "unattempted_count",
+          "score_percent",
+          "accuracy_percent",
+          "total_time_spent_ms",
+          "completion_percent",
+          "average_time_spent_ms",
+          "accuracy_interval_95"
+        ],
+        "title": "HistoryMetrics"
+      },
+      "HistoryTopic": {
+        "properties": {
+          "total_questions": {
+            "type": "integer",
+            "title": "Total Questions"
+          },
+          "answered_count": {
+            "type": "integer",
+            "title": "Answered Count"
+          },
+          "correct_count": {
+            "type": "integer",
+            "title": "Correct Count"
+          },
+          "incorrect_count": {
+            "type": "integer",
+            "title": "Incorrect Count"
+          },
+          "unattempted_count": {
+            "type": "integer",
+            "title": "Unattempted Count"
+          },
+          "score_percent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score Percent"
+          },
+          "accuracy_percent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accuracy Percent"
+          },
+          "total_time_spent_ms": {
+            "type": "integer",
+            "title": "Total Time Spent Ms"
+          },
+          "completion_percent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completion Percent"
+          },
+          "average_time_spent_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Average Time Spent Ms"
+          },
+          "accuracy_interval_95": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accuracy Interval 95"
+          },
+          "topic": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Topic"
+          },
+          "exam_count": {
+            "type": "integer",
+            "title": "Exam Count"
+          },
+          "classification": {
+            "type": "string",
+            "enum": [
+              "strong",
+              "weak",
+              "developing",
+              "insufficient_data"
+            ],
+            "title": "Classification"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_questions",
+          "answered_count",
+          "correct_count",
+          "incorrect_count",
+          "unattempted_count",
+          "score_percent",
+          "accuracy_percent",
+          "total_time_spent_ms",
+          "completion_percent",
+          "average_time_spent_ms",
+          "accuracy_interval_95",
+          "topic",
+          "exam_count",
+          "classification"
+        ],
+        "title": "HistoryTopic"
+      },
+      "OptionView": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "label",
+          "text"
+        ],
+        "title": "OptionView"
+      },
+      "Pacing": {
+        "properties": {
+          "average_correct_time_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Average Correct Time Ms"
+          },
+          "average_incorrect_time_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Average Incorrect Time Ms"
+          },
+          "average_unattempted_time_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Average Unattempted Time Ms"
+          },
+          "rapid_incorrect_count": {
+            "type": "integer",
+            "title": "Rapid Incorrect Count"
+          },
+          "revisited_question_count": {
+            "type": "integer",
+            "title": "Revisited Question Count"
+          },
+          "unvisited_question_count": {
+            "type": "integer",
+            "title": "Unvisited Question Count"
+          },
+          "answer_transition_count": {
+            "type": "integer",
+            "title": "Answer Transition Count"
+          },
+          "focus_budget_utilization_percent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Focus Budget Utilization Percent"
+          }
+        },
+        "type": "object",
+        "required": [
+          "average_correct_time_ms",
+          "average_incorrect_time_ms",
+          "average_unattempted_time_ms",
+          "rapid_incorrect_count",
+          "revisited_question_count",
+          "unvisited_question_count",
+          "answer_transition_count",
+          "focus_budget_utilization_percent"
+        ],
+        "title": "Pacing"
+      },
+      "PaperOption": {
+        "properties": {
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          }
+        },
+        "type": "object",
+        "required": [
+          "label",
+          "text"
+        ],
+        "title": "PaperOption"
+      },
+      "PaperQuestion": {
+        "properties": {
+          "position": {
+            "type": "integer",
+            "title": "Position"
+          },
+          "question_text": {
+            "type": "string",
+            "title": "Question Text"
+          },
+          "difficulty": {
+            "type": "string",
+            "enum": [
+              "easy",
+              "medium",
+              "hard"
+            ],
+            "title": "Difficulty"
+          },
+          "topic": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Topic"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "previous_year",
+              "generated"
+            ],
+            "title": "Source"
+          },
+          "options": {
+            "items": {
+              "$ref": "#/components/schemas/PaperOption"
+            },
+            "type": "array",
+            "title": "Options"
+          }
+        },
+        "type": "object",
+        "required": [
+          "position",
+          "question_text",
+          "difficulty",
+          "topic",
+          "source",
+          "options"
+        ],
+        "title": "PaperQuestion"
+      },
+      "PerformanceView": {
+        "properties": {
+          "generated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Generated At"
+          },
+          "submitted_exam_count": {
+            "type": "integer",
+            "title": "Submitted Exam Count"
+          },
+          "overall": {
+            "$ref": "#/components/schemas/HistoryMetrics"
+          },
+          "mean_exam_score_percent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mean Exam Score Percent"
+          },
+          "median_exam_score_percent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Median Exam Score Percent"
+          },
+          "best_exam_score_percent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Best Exam Score Percent"
+          },
+          "worst_exam_score_percent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Worst Exam Score Percent"
+          },
+          "score_standard_deviation": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score Standard Deviation"
+          },
+          "current_80_percent_score_streak": {
+            "type": "integer",
+            "title": "Current 80 Percent Score Streak"
+          },
+          "topics": {
+            "items": {
+              "$ref": "#/components/schemas/HistoryTopic"
+            },
+            "type": "array",
+            "title": "Topics"
+          },
+          "strong_topics": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Strong Topics"
+          },
+          "weak_topics": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Weak Topics"
+          },
+          "by_difficulty": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/DifficultyHistory"
+            },
+            "type": "object",
+            "title": "By Difficulty"
+          },
+          "timeline": {
+            "items": {
+              "$ref": "#/components/schemas/ExamHistoryItem"
+            },
+            "type": "array",
+            "title": "Timeline"
+          },
+          "trend": {
+            "$ref": "#/components/schemas/Trend"
+          },
+          "pacing": {
+            "$ref": "#/components/schemas/Pacing"
+          },
+          "submission_reasons": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Submission Reasons"
+          },
+          "findings": {
+            "items": {
+              "$ref": "#/components/schemas/Finding"
+            },
+            "type": "array",
+            "title": "Findings"
+          },
+          "limitations": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Limitations"
+          }
+        },
+        "type": "object",
+        "required": [
+          "generated_at",
+          "submitted_exam_count",
+          "overall",
+          "mean_exam_score_percent",
+          "median_exam_score_percent",
+          "best_exam_score_percent",
+          "worst_exam_score_percent",
+          "score_standard_deviation",
+          "current_80_percent_score_streak",
+          "topics",
+          "strong_topics",
+          "weak_topics",
+          "by_difficulty",
+          "timeline",
+          "trend",
+          "pacing",
+          "submission_reasons",
+          "findings",
+          "limitations"
+        ],
+        "title": "PerformanceView"
+      },
+      "QuestionView": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "source_question_id": {
+            "type": "integer",
+            "title": "Source Question Id"
+          },
+          "position": {
+            "type": "integer",
+            "title": "Position"
+          },
+          "question_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Question Text"
+          },
+          "topic": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Topic"
+          },
+          "difficulty": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Difficulty"
+          },
+          "has_image": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Has Image"
+          },
+          "options": {
+            "items": {
+              "$ref": "#/components/schemas/OptionView"
+            },
+            "type": "array",
+            "title": "Options"
+          },
+          "selected_option_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Selected Option Id"
+          },
+          "marked_for_review": {
+            "type": "boolean",
+            "title": "Marked For Review"
+          },
+          "time_spent_ms": {
+            "type": "integer",
+            "title": "Time Spent Ms"
+          },
+          "visit_count": {
+            "type": "integer",
+            "title": "Visit Count"
+          },
+          "answer_change_count": {
+            "type": "integer",
+            "title": "Answer Change Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "source_question_id",
+          "position",
+          "question_text",
+          "topic",
+          "difficulty",
+          "has_image",
+          "options",
+          "selected_option_id",
+          "marked_for_review",
+          "time_spent_ms",
+          "visit_count",
+          "answer_change_count"
+        ],
+        "title": "QuestionView"
+      },
+      "Recommendation": {
+        "properties": {
+          "priority": {
+            "type": "string",
+            "enum": [
+              "high",
+              "medium",
+              "low"
+            ],
+            "title": "Priority"
+          },
+          "topic": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Topic"
+          },
+          "action": {
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 1,
+            "title": "Action"
+          },
+          "rationale": {
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 1,
+            "title": "Rationale"
+          },
+          "evidence_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 10,
+            "minItems": 1,
+            "title": "Evidence Ids"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "priority",
+          "topic",
+          "action",
+          "rationale",
+          "evidence_ids"
+        ],
+        "title": "Recommendation"
+      },
+      "ReviewRequest": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Version"
+          },
+          "marked": {
+            "type": "boolean",
+            "title": "Marked"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "version",
+          "marked"
+        ],
+        "title": "ReviewRequest"
+      },
+      "SuggestionsView": {
+        "properties": {
+          "performance": {
+            "$ref": "#/components/schemas/PerformanceView"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "ai",
+              "rules"
+            ],
+            "title": "Source"
+          },
+          "fallback_reason": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "not_configured",
+                  "unavailable",
+                  "invalid_response",
+                  "insufficient_history"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fallback Reason"
+          },
+          "advice": {
+            "$ref": "#/components/schemas/CoachingAdvice"
+          }
+        },
+        "type": "object",
+        "required": [
+          "performance",
+          "source",
+          "fallback_reason",
+          "advice"
+        ],
+        "title": "SuggestionsView"
+      },
+      "Summary": {
+        "properties": {
+          "total_questions": {
+            "type": "integer",
+            "title": "Total Questions"
+          },
+          "answered_count": {
+            "type": "integer",
+            "title": "Answered Count"
+          },
+          "correct_count": {
+            "type": "integer",
+            "title": "Correct Count"
+          },
+          "incorrect_count": {
+            "type": "integer",
+            "title": "Incorrect Count"
+          },
+          "unattempted_count": {
+            "type": "integer",
+            "title": "Unattempted Count"
+          },
+          "score_percent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score Percent"
+          },
+          "accuracy_percent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accuracy Percent"
+          },
+          "total_time_spent_ms": {
+            "type": "integer",
+            "title": "Total Time Spent Ms"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_questions",
+          "answered_count",
+          "correct_count",
+          "incorrect_count",
+          "unattempted_count",
+          "score_percent",
+          "accuracy_percent",
+          "total_time_spent_ms"
+        ],
+        "title": "Summary"
+      },
+      "TopicBreakdown": {
+        "properties": {
+          "total_questions": {
+            "type": "integer",
+            "title": "Total Questions"
+          },
+          "answered_count": {
+            "type": "integer",
+            "title": "Answered Count"
+          },
+          "correct_count": {
+            "type": "integer",
+            "title": "Correct Count"
+          },
+          "incorrect_count": {
+            "type": "integer",
+            "title": "Incorrect Count"
+          },
+          "unattempted_count": {
+            "type": "integer",
+            "title": "Unattempted Count"
+          },
+          "score_percent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score Percent"
+          },
+          "accuracy_percent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accuracy Percent"
+          },
+          "total_time_spent_ms": {
+            "type": "integer",
+            "title": "Total Time Spent Ms"
+          },
+          "topic": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Topic"
+          },
+          "classification": {
+            "type": "string",
+            "enum": [
+              "strong",
+              "weak",
+              "developing",
+              "insufficient_data"
+            ],
+            "title": "Classification"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_questions",
+          "answered_count",
+          "correct_count",
+          "incorrect_count",
+          "unattempted_count",
+          "score_percent",
+          "accuracy_percent",
+          "total_time_spent_ms",
+          "topic",
+          "classification"
+        ],
+        "title": "TopicBreakdown"
+      },
+      "Trend": {
+        "properties": {
+          "window_size": {
+            "type": "integer",
+            "title": "Window Size"
+          },
+          "recent_exam_count": {
+            "type": "integer",
+            "title": "Recent Exam Count"
+          },
+          "previous_exam_count": {
+            "type": "integer",
+            "title": "Previous Exam Count"
+          },
+          "recent_mean_score_percent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recent Mean Score Percent"
+          },
+          "previous_mean_score_percent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous Mean Score Percent"
+          },
+          "score_change_percentage_points": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score Change Percentage Points"
+          },
+          "recent_mean_accuracy_percent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recent Mean Accuracy Percent"
+          },
+          "direction": {
+            "type": "string",
+            "enum": [
+              "insufficient_data",
+              "improving",
+              "declining",
+              "stable"
+            ],
+            "title": "Direction"
+          }
+        },
+        "type": "object",
+        "required": [
+          "window_size",
+          "recent_exam_count",
+          "previous_exam_count",
+          "recent_mean_score_percent",
+          "previous_mean_score_percent",
+          "score_change_percentage_points",
+          "recent_mean_accuracy_percent",
+          "direction"
+        ],
+        "title": "Trend"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "Versioned": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Version"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "version"
+        ],
+        "title": "Versioned"
+      }
+    },
+    "securitySchemes": {
+      "HTTPBearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  }
+}
