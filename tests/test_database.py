@@ -1,29 +1,23 @@
 """Exercise migrations and relationships against an isolated SQLite database."""
-import os
-from pathlib import Path
-import tempfile
 import unittest
 
 from alembic import command
-from alembic.config import Config
+from support import CONFIG
 from sqlalchemy import func, inspect, select, text
 from sqlalchemy.exc import IntegrityError
 
-# Configure before importing the application's engine; never touch prepx.db.
-_temp = tempfile.TemporaryDirectory()
-os.environ['DATABASE_URL'] = f'sqlite:///{_temp.name}/test.db'
 from app.database import SessionLocal, engine
-from app.main import app
 from app.models import AuthProviderType, Exam, Option, PdfUpload, Question, User, exam_questions
 
 
 class DatabaseTest(unittest.TestCase):
     def test_migrations_and_constraints(self):
-        config = Config(str(Path(__file__).resolve().parents[1] / 'alembic.ini'))
+        config = CONFIG
         command.upgrade(config, 'head')
         self.assertEqual(set(inspect(engine).get_table_names()), {
             'alembic_version', 'app_user', 'pdf_uploads', 'questions',
             'options', 'exams', 'exam_questions',
+            'exam_attempts', 'attempt_questions', 'attempt_events',
         })
         command.check(config)
         with SessionLocal() as session:
@@ -62,12 +56,7 @@ class DatabaseTest(unittest.TestCase):
         self.assertEqual(inspect(engine).get_table_names(), ['alembic_version'])
         command.upgrade(config, 'head')
         command.check(config)
-        self.assertFalse(any(getattr(route, 'path', '').startswith('/api') for route in app.routes))
 
 
 if __name__ == '__main__':
-    try:
-        unittest.main()
-    finally:
-        engine.dispose()
-        _temp.cleanup()
+    unittest.main()

@@ -5,8 +5,9 @@ Timestamps use naive UTC. Nullable fields mirror the original JPA entities.
 from datetime import date, datetime, timezone
 from enum import Enum
 
-from sqlalchemy import Boolean, Column, Date, DateTime, Enum as SAEnum, ForeignKey, Index, Integer, String, Table, Text
+from sqlalchemy import Boolean, Column, Date, DateTime, Enum as SAEnum, ForeignKey, Index, Integer, JSON, String, Table, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from app.conduction.models import Attempt, AttemptEvent, AttemptQuestion  # noqa: E402,F401
 
 from app.database import Base
 
@@ -95,9 +96,12 @@ class Exam(Base):
     question_count: Mapped[int] = mapped_column(Integer, default=0)
     per_question_time_seconds: Mapped[int] = mapped_column(Integer, default=0)
     total_time_seconds: Mapped[int] = mapped_column(Integer, default=0)
+    paper: Mapped[dict | None] = mapped_column(JSON)
     important_topics: Mapped[str | None] = mapped_column(Text)  # Comma-separated, as in Java.
     pdf_upload_id: Mapped[int | None] = mapped_column(ForeignKey("pdf_uploads.id"), index=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("app_user.id"), index=True)
     pdf_upload: Mapped[PdfUpload | None] = relationship(back_populates="exams")
     user: Mapped[User] = relationship(back_populates="exams")
     questions: Mapped[list[Question]] = relationship(secondary=exam_questions, back_populates="exams", passive_deletes=True)
+
+# Register conduction tables for Alembic and metadata consumers.
