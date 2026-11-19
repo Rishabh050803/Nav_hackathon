@@ -7,6 +7,7 @@ from enum import Enum
 
 from sqlalchemy import Boolean, Column, Date, DateTime, Enum as SAEnum, ForeignKey, Index, Integer, JSON, String, Table, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from app.conduction.models import Attempt, AttemptEvent, AttemptQuestion  # noqa: E402,F401
 
 from app.database import Base
 
@@ -102,3 +103,5 @@ class Exam(Base):
     pdf_upload: Mapped[PdfUpload | None] = relationship(back_populates="exams")
     user: Mapped[User] = relationship(back_populates="exams")
     questions: Mapped[list[Question]] = relationship(secondary=exam_questions, back_populates="exams", passive_deletes=True)
+
+# Register conduction tables for Alembic and metadata consumers.
