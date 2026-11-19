@@ -1,9 +1,8 @@
 # PrepX FastAPI backend
 
-Standalone SQLite backend inspired by `../PrepX-exam_creation/backend/prepx`.
-The original exam data models are retained. Exam conduction adds authenticated
-API endpoints, resumable attempts, automatic submission, and analysis data.
-Python 3.10+ is required.
+Python backend inspired by the original Java project in
+`../PrepX-exam_creation/backend/prepx`. This directory is the standalone PrepX project.
+Python 3.10+ is required. See [Exam generation](EXAM_GENERATION.md) for architecture, configuration, schema changes, and API examples.
 
 ## Setup
 

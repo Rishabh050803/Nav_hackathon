@@ -7,7 +7,6 @@ from sqlalchemy import func, inspect, select, text
 from sqlalchemy.exc import IntegrityError
 
 from app.database import SessionLocal, engine
-from app.main import app
 from app.models import AuthProviderType, Exam, Option, PdfUpload, Question, User, exam_questions
 
 
@@ -58,6 +57,10 @@ class DatabaseTest(unittest.TestCase):
         command.upgrade(config, 'head')
         command.check(config)
 
+
+def tearDownModule():
+    engine.dispose()
+    _temp.cleanup()
 
 
 if __name__ == '__main__':

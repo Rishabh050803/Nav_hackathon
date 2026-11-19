@@ -1,6 +1,10 @@
 import asyncio
 from contextlib import asynccontextmanager, suppress
 
+from app.exams import router
+
+app = FastAPI(title="PrepX", description="Exam creation backend", version="0.2.0")
+app.include_router(router)
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
