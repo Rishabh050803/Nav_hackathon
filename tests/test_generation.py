@@ -6,6 +6,7 @@ from support import migrate
 from fastapi.testclient import TestClient
 from sqlalchemy import delete, func, select
 
+from app.auth import mint_token
 from app.database import Base, SessionLocal, engine
 from app.generation.llm import GenerationUnavailable
 from app.main import app
@@ -72,6 +73,28 @@ class GenerationTest(unittest.TestCase):
         self.assertNotIn('is_correct', response.text)
         fetched = self.client.get(f"/api/exams/{paper['id']}", headers=self.headers)
         self.assertEqual(fetched.json(), paper)
+
+        bearer = {'Authorization': f'Bearer {mint_token(self.uid)}'}
+        attempt_response = self.client.post(f"/api/exams/{paper['id']}/attempt", headers=bearer)
+        self.assertEqual(attempt_response.status_code, 200, attempt_response.text)
+        attempt = attempt_response.json()
+        self.assertEqual(
+            [q['question_text'] for q in attempt['questions']],
+            [q['question_text'] for q in paper['questions']],
+        )
+        path = f"/api/attempts/{attempt['id']}"
+        bank = next(q for q in attempt['questions'] if q['source_question_id'] > 0)
+        answer = self.client.put(f"{path}/questions/{bank['id']}/answer", headers=bearer, json={
+            'version': attempt['version'], 'option_id': bank['options'][1]['id'],
+        })
+        self.assertEqual(answer.status_code, 200, answer.text)
+        submitted = self.client.post(f'{path}/submit', headers=bearer, json={'version': answer.json()['version']})
+        self.assertEqual(submitted.status_code, 200, submitted.text)
+        report = self.client.get(f'{path}/analysis', headers=bearer)
+        self.assertEqual(report.status_code, 200, report.text)
+        self.assertEqual(report.json()['weak_topics'], ['Math'])
+        self.assertEqual({q['status'] for q in report.json()['questions']}, {'incorrect', 'unattempted'})
+        self.assertEqual(report.json()['incorrect_count'], 1)
 
     def test_invalid_model_saves_no_partial_paper(self):
         body = {**self.body, 'generated_question_count': 1}

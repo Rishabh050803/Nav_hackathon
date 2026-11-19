@@ -178,7 +178,12 @@ class ConductionTest(unittest.TestCase):
         other = {'Authorization': f'Bearer {mint_token(self.other)}'}
         self.assertEqual(self.client.get(f"/api/attempts/{s['id']}", headers=other).status_code, 404)
         self.assertEqual(self.client.post(f'/api/exams/{self.eid}/attempt', headers=other).status_code, 404)
-        with patch('app.conduction.router.utc_now', return_value=T0):
+        with (patch('app.conduction.router.utc_now', return_value=T0),
+              patch('app.exam_analysis.routes.utc_now', return_value=T0),
+              patch('app.exam_evaluation.routes.utc_now', return_value=T0)):
+            evaluation_path = f"/api/attempts/{s['id']}/evaluation"
+            self.assertEqual(self.client.get(evaluation_path, headers=self.headers).status_code, 409)
+            self.assertEqual(self.client.get(evaluation_path, headers=other).status_code, 404)
             self.assertEqual(self.client.get(f"/api/attempts/{s['id']}/analysis", headers=self.headers).status_code, 409)
             path = f"/api/attempts/{s['id']}/questions/{s['questions'][0]['id']}/answer"
             self.assertEqual(self.client.put(path, headers=self.headers, json={'version': 1}).status_code, 422)
@@ -191,7 +196,17 @@ class ConductionTest(unittest.TestCase):
             self.assertEqual(submitted.status_code, 200)
             report = self.client.get(f"/api/attempts/{s['id']}/analysis", headers=self.headers)
             self.assertEqual(report.status_code, 200, report.text)
-            self.assertEqual(report.json()['correct_count'], 1)
+            analysis = report.json()
+            self.assertEqual(analysis['correct_count'], 1)
+            self.assertEqual(analysis['score_percent'], 50)
+            self.assertEqual(analysis['accuracy_percent'], 100)
+            self.assertEqual(analysis['strong_topics'], ['math'])
+            self.assertEqual(analysis['weak_topics'], [])
+            self.assertEqual(analysis['unvisited_count'], 1)
+            self.assertEqual([row['status'] for row in analysis['questions']], ['correct', 'unattempted'])
+            evaluation = self.client.get(evaluation_path, headers=self.headers)
+            self.assertEqual(evaluation.status_code, 200)
+            self.assertEqual(evaluation.json()['unattempted_count'], 1)
 
     def test_concurrent_answers_only_one_version_wins(self):
         s = self.start(utc_now())
