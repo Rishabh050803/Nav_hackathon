@@ -56,14 +56,19 @@ models through your existing workflow or a trusted local script first.
 
 ## Authentication
 
-Register and log in using the [authentication API](app/authentication/README.md).
-Send the returned token in the Authorization header for exam requests. Configure
-AUTH_TOKEN_SECRET before starting the server. For local development with an
-existing demo account, use the same signing secret and run:
+Requests use `Authorization: Bearer <token>`. The isolated adapter in `app/auth.py`
+verifies HMAC-signed, expiring tokens and checks that the user still exists. There
+is no login endpoint in this branch. A trusted developer can mint a local token
+for an existing user (with the same `AUTH_TOKEN_SECRET` as the server):
 
-~~~sh
+```sh
 python -m app.auth 1 --ttl 7200
-~~~
+```
+
+Use a lifetime long enough for the exam and expected pauses, or replace the
+`current_user` dependency with your main identity provider. The adapter fails
+closed if the secret is absent or shorter than 32 characters. Never mint tokens
+in a browser or expose the signing secret.
 
 ## API and client integration
 
