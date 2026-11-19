@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends
 from app.auth import current_user
 from app.models import utc_now
 from app.conduction import service
-from app.conduction.schemas import AnalysisView, AnswerRequest, AttemptView, ReviewRequest, Versioned
+from app.conduction.schemas import AnswerRequest, AttemptView, ReviewRequest, Versioned
 from app.conduction.transactions import transaction
 
 router = APIRouter(prefix='/api', tags=['Exam conduction'])
@@ -22,14 +22,6 @@ def get_attempt(attempt_id: int, user_id: int = Depends(current_user)):
     with transaction() as session:
         now = utc_now()
         return service.view(service.owned(session, attempt_id, user_id, now), now)
-
-
-@router.get('/attempts/{attempt_id}/analysis', response_model=AnalysisView)
-def get_analysis(attempt_id: int, user_id: int = Depends(current_user)):
-    with transaction() as session:
-        attempt = service.owned(session, attempt_id, user_id, utc_now())
-        session.flush()  # Include IDs of any auto-submission event.
-        return service.analysis(attempt)
 
 
 def change(attempt_id, user_id, action, body, question_id=None, **kwargs):

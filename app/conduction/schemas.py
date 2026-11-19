@@ -64,34 +64,3 @@ class AttemptView(Output):
     active_question_id: int | None
     answered_count: int
     questions: list[QuestionView]
-
-
-class AnalysisQuestion(Output):
-    question_id: int
-    source_question_id: int
-    topic: str | None
-    difficulty: str | None
-    selected_option_id: int | None
-    correct_option_ids: list[int]
-    is_correct: bool
-    time_spent_ms: int
-    visit_count: int
-    answer_change_count: int
-
-
-class EventView(Output):
-    id: int
-    kind: str
-    occurred_at: datetime
-    question_id: int | None
-    details: dict
-
-
-class AnalysisView(Output):
-    attempt_id: int
-    total_questions: int
-    answered_count: int
-    correct_count: int
-    total_time_spent_ms: int
-    questions: list[AnalysisQuestion]
-    events: list[EventView]

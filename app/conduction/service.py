@@ -9,6 +9,7 @@ from math import ceil
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.exam_analysis.service import build_report
 from app.models import Exam
 from app.conduction.models import Attempt, AttemptEvent, AttemptQuestion
 
@@ -68,6 +69,30 @@ def owned(session: Session, attempt_id: int, user_id: int, now: datetime) -> Att
     return attempt
 
 
+def snapshot_questions(exam: Exam) -> list[AttemptQuestion]:
+    if exam.paper is not None:
+        return [
+            AttemptQuestion(
+                # Generated questions have a negative, paper-local source ID.
+                source_question_id=item.get('bank_question_id', -item['position']),
+                position=item['position'], question_text=item['question_text'],
+                topic=item['topic'], difficulty=item['difficulty'], has_image=False,
+                options=[dict(option, id=index) for index, option in enumerate(item['options'], start=1)],
+            )
+            for item in exam.paper['questions']
+        ]
+
+    # Legacy join table has no order, so freeze deterministic ID order at start.
+    return [
+        AttemptQuestion(
+            source_question_id=question.id, position=index, question_text=question.question_text,
+            topic=question.topic, difficulty=question.difficulty, has_image=question.has_image,
+            options=[dict(id=option.id, label=option.label, text=option.text, is_correct=option.is_correct)
+                     for option in sorted(question.options, key=lambda option: option.id)],
+        )
+        for index, question in enumerate(sorted(exam.questions, key=lambda question: question.id), start=1)
+    ]
+
 def start(session: Session, exam_id: int, user_id: int, now: datetime) -> Attempt:
     exam = session.scalar(select(Exam).where(Exam.id == exam_id, Exam.user_id == user_id))
     if exam is None:
@@ -77,22 +102,15 @@ def start(session: Session, exam_id: int, user_id: int, now: datetime) -> Attemp
         settle(existing, now)
         return existing  # Retried start never resets an attempt.
     duration = exam.total_time_seconds or exam.max_time * 60
-    if duration <= 0 or not exam.questions:
+    questions = snapshot_questions(exam)
+    if duration <= 0 or not questions:
         raise RuleError('Exam must contain questions and have a positive time limit', 422)
-    # Legacy join table has no order, so freeze deterministic ID order at start.
-    sources = sorted(exam.questions, key=lambda q: q.id)
-    if any(not q.options for q in sources):
+    if any(not question.options for question in questions):
         raise RuleError('Every question must have at least one option', 422)
     attempt = Attempt(exam_id=exam.id, user_id=user_id, title=exam.title,
                       duration_seconds=duration, started_at=now,
                       deadline=now + timedelta(seconds=duration), status='running', version=1)
-    attempt.questions = [AttemptQuestion(
-        source_question_id=q.id, position=index + 1, question_text=q.question_text,
-        topic=q.topic, difficulty=q.difficulty, has_image=q.has_image,
-        options=[dict(id=o.id, label=o.label, text=o.text, is_correct=o.is_correct)
-                 for o in sorted(q.options, key=lambda o: o.id)],
-        marked_for_review=False, time_spent_ms=0, visit_count=0, answer_change_count=0,
-    ) for index, q in enumerate(sources)]
+    attempt.questions = questions
     session.add(attempt)
     session.flush()
     first = attempt.questions[0]
@@ -192,22 +210,11 @@ def view(attempt: Attempt, now: datetime) -> dict:
                 questions=questions)
 
 
-def analysis(attempt: Attempt) -> dict:
+def require_submitted(attempt: Attempt):
     if attempt.status != 'submitted':
         raise RuleError('Analysis is available after submission')
-    rows = []
-    for q in attempt.questions:
-        selected = next((o for o in q.options if o['id'] == q.selected_option_id), None)
-        rows.append(dict(question_id=q.id, source_question_id=q.source_question_id, topic=q.topic,
-                         difficulty=q.difficulty, selected_option_id=q.selected_option_id,
-                         correct_option_ids=[o['id'] for o in q.options if o['is_correct']],
-                         is_correct=bool(selected and selected['is_correct']),
-                         time_spent_ms=q.time_spent_ms, visit_count=q.visit_count,
-                         answer_change_count=q.answer_change_count))
-    return dict(attempt_id=attempt.id, total_questions=len(rows),
-                answered_count=sum(r['selected_option_id'] is not None for r in rows),
-                correct_count=sum(r['is_correct'] for r in rows),
-                total_time_spent_ms=sum(r['time_spent_ms'] for r in rows), questions=rows,
-                events=[dict(id=e.id, kind=e.kind, occurred_at=e.occurred_at,
-                             question_id=e.question_id, details=e.details)
-                        for e in sorted(attempt.events, key=lambda e: e.id)])
+
+
+def analysis(attempt: Attempt) -> dict:
+    require_submitted(attempt)
+    return build_report(attempt)
