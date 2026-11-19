@@ -13,7 +13,6 @@ from sqlalchemy.exc import IntegrityError
 _temp = tempfile.TemporaryDirectory()
 os.environ['DATABASE_URL'] = f'sqlite:///{_temp.name}/test.db'
 from app.database import SessionLocal, engine
-from app.main import app
 from app.models import AuthProviderType, Exam, Option, PdfUpload, Question, User, exam_questions
 
 
@@ -62,12 +61,12 @@ class DatabaseTest(unittest.TestCase):
         self.assertEqual(inspect(engine).get_table_names(), ['alembic_version'])
         command.upgrade(config, 'head')
         command.check(config)
-        self.assertFalse(any(getattr(route, 'path', '').startswith('/api') for route in app.routes))
+
+
+def tearDownModule():
+    engine.dispose()
+    _temp.cleanup()
 
 
 if __name__ == '__main__':
-    try:
-        unittest.main()
-    finally:
-        engine.dispose()
-        _temp.cleanup()
+    unittest.main()

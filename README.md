@@ -1,8 +1,8 @@
 # PrepX FastAPI backend
 
-Database-only Python backend inspired by the original Java project in
+Python backend inspired by the original Java project in
 `../PrepX-exam_creation/backend/prepx`. This directory is the standalone PrepX project.
-Python 3.10+ is required. No application API endpoints or business services are implemented.
+Python 3.10+ is required. See [Exam generation](EXAM_GENERATION.md) for architecture, configuration, schema changes, and API examples.
 
 ## Setup
 
