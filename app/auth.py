@@ -1,9 +1,4 @@
-"""Small signed bearer-token adapter until the main authentication flow exists.
-
-Only a trusted server-side caller should mint tokens. No user-ID headers or
-client-selected identities are accepted. Replace current_user with the eventual
-auth provider integration without changing the conduction service.
-"""
+"""Shared signed bearer-token adapter and local token-minting CLI."""
 import base64
 import hashlib
 import hmac
