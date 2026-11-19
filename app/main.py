@@ -5,7 +5,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from app.conduction.router import router as conduction_router
-from app.exam_analysis.routes import router as analysis_router
+from app.exam_analysis.routes import router as analysis_router, history_router
 from app.exam_evaluation.routes import router as evaluation_router
 from app.generation.router import router as generation_router
 from app.conduction.service import RuleError
@@ -29,6 +29,7 @@ app.include_router(generation_router)
 app.include_router(conduction_router)
 app.include_router(evaluation_router)
 app.include_router(analysis_router)
+app.include_router(history_router)
 
 
 @app.exception_handler(RuleError)

@@ -1,1 +1,1 @@
-"""Performance reports for submitted exams."""
+"""Per-attempt reports, historical performance statistics, and AI coaching."""

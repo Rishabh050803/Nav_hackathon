@@ -1,5 +1,7 @@
 # PrepX FastAPI backend
 
+History statistics and AI coaching are documented in [Exam analysis](EXAM_ANALYSIS.md).
+
 Python backend inspired by the original Java project in
 `../PrepX-exam_creation/backend/prepx`. This directory is the standalone PrepX project.
 Python 3.10+ is required. See [Exam generation](EXAM_GENERATION.md) for architecture, configuration, schema changes, and API examples.
@@ -146,7 +148,7 @@ transactions, and the deadline worker under `app/conduction/`. Generation has it
 own routing, schemas, services, dependencies, and model adapter under `app/generation/`.
 
 `tests/live_endpoints.py` starts a real local Uvicorn server against a temporary
-SQLite database and checks all 10 endpoint operations with 30 HTTP assertions.
+SQLite database and checks conduction and history endpoints with 34 HTTP assertions.
 It also verifies server restart recovery and automatic deadline submission without
 client requests. The pause-expiry scenario advances its test database deadline
 instead of waiting 15 minutes. It cleans up its server and temporary data.
