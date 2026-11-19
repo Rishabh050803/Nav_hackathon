@@ -1,0 +1,3 @@
+# Optional; use Python 3.11/3.12 for the widest ML wheel compatibility.
+pix2text>=1.1.4,<2
+easyocr>=1.7,<2
