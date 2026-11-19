@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager, suppress
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
+from app.authentication.router import router as authentication_router
 from app.conduction.router import router as conduction_router
 from app.exam_analysis.routes import router as analysis_router, history_router
 from app.exam_evaluation.routes import router as evaluation_router
@@ -25,6 +26,7 @@ async def lifespan(app):
 
 app = FastAPI(title='PrepX', description='Exam creation and conduction backend',
               version='0.2.0', lifespan=lifespan)
+app.include_router(authentication_router)
 app.include_router(generation_router)
 app.include_router(conduction_router)
 app.include_router(evaluation_router)

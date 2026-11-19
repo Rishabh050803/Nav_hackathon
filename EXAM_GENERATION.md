@@ -41,7 +41,7 @@ The existing timing fields store per-question and total seconds. Legacy `max_tim
 | `EXAM_LLM_MODEL` | Model identifier supporting JSON object responses. |
 | `EXAM_LLM_API_KEY` | Optional bearer token for the model endpoint. |
 
-Both API calls use `X-Exam-Api-Key` and `X-User-Id`. The caller must authenticate the end user and derive their ID before forwarding the request. Keep the shared key on the server. Users and previous-year questions must already exist in the configured SQLite database. Unattached questions are treated as shared bank records. Model requests include reference stems and topic labels.
+Use Authorization: Bearer <token> from the [authentication API](app/authentication/README.md) for both calls. Trusted server callers can also use X-Exam-Api-Key and X-User-Id. The trusted caller authenticates the end user and sets the user ID. Users and previous-year questions must already exist in the configured SQLite database. Unattached questions are treated as shared bank records. Model requests include reference stems and topic labels.
 
 ## API
 
