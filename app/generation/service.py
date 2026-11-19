@@ -1,119 +1,16 @@
-"""Select questions, generate variants, and persist complete exam papers."""
-
+"""Question selection, model generation, and exam paper persistence."""
 from collections import Counter
-from datetime import datetime
-from hmac import compare_digest
-import os
 from random import shuffle
-from typing import Annotated, Literal
 
-from fastapi import APIRouter, Depends, Header, HTTPException
-from pydantic import BaseModel, Field, StringConstraints, ValidationError, model_validator
+from fastapi import HTTPException
+from pydantic import ValidationError
 from sqlalchemy import or_, select
 from sqlalchemy.orm import Session, selectinload
 
-from app.database import SessionLocal
-from app.exam_llm import GenerationUnavailable, InvalidGeneration, generate_questions
+from app.generation.llm import GenerationUnavailable, InvalidGeneration, generate_questions
+from app.generation.schemas import ExamPaper, GenerateExam, GeneratedQuestion
+from app.generation.utils import Difficulties, normalize
 from app.models import Exam, PdfUpload, Question, User
-
-router = APIRouter(prefix="/api/exams", tags=["exams"])
-Difficulty = Literal["easy", "medium", "hard"]
-Difficulties = ("easy", "medium", "hard")
-Topic = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=255)]
-
-
-class DifficultyCounts(BaseModel, extra="forbid"):
-    easy: int = Field(default=0, ge=0, strict=True)
-    medium: int = Field(default=0, ge=0, strict=True)
-    hard: int = Field(default=0, ge=0, strict=True)
-
-
-class GenerateExam(BaseModel, extra="forbid"):
-    title: Topic = "Practice exam"
-    question_count: int = Field(ge=1, le=100, strict=True)
-    per_question_time_seconds: int = Field(ge=1, le=3600, strict=True)
-    difficulty: Difficulty | None = None
-    difficulty_counts: DifficultyCounts | None = None
-    important_topics: list[Topic] = Field(default_factory=list, max_length=20)
-    generated_question_count: int = Field(default=0, ge=0, le=20, strict=True)
-    pdf_upload_id: int | None = Field(default=None, gt=0, strict=True)
-
-    @model_validator(mode="after")
-    def validate_counts(self):
-        if (self.difficulty is None) == (self.difficulty_counts is None):
-            raise ValueError("Provide either difficulty or difficulty_counts.")
-        if sum(self.counts().values()) != self.question_count:
-            raise ValueError("Difficulty counts must sum to question_count.")
-        if self.generated_question_count > self.question_count:
-            raise ValueError("generated_question_count cannot exceed question_count.")
-        if len({normalize(topic) for topic in self.important_topics}) != len(self.important_topics):
-            raise ValueError("Important topics must be unique.")
-        return self
-
-    def counts(self) -> dict[str, int]:
-        if self.difficulty_counts:
-            return self.difficulty_counts.model_dump()
-        return {level: self.question_count if self.difficulty == level else 0
-                for level in Difficulties}
-
-
-class GeneratedQuestion(BaseModel, extra="forbid"):
-    question_text: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=4000)]
-    options: list[Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=1000)]] = Field(
-        min_length=4, max_length=4
-    )
-    correct_index: int = Field(ge=0, le=3, strict=True)
-
-
-class PaperOption(BaseModel):
-    label: str
-    text: str
-
-
-class PaperQuestion(BaseModel):
-    position: int
-    question_text: str
-    difficulty: Difficulty
-    topic: str | None
-    source: Literal["previous_year", "generated"]
-    options: list[PaperOption]
-
-
-class ExamPaper(BaseModel):
-    id: int
-    title: str
-    created_at: datetime
-    question_count: int
-    per_question_time_seconds: int
-    total_time_seconds: int
-    difficulty_counts: DifficultyCounts
-    important_topics: list[str]
-    generated_question_count: int
-    pdf_upload_id: int | None
-    questions: list[PaperQuestion]
-
-
-def normalize(value: str | None) -> str:
-    return " ".join((value or "").casefold().split())
-
-
-def get_session():
-    with SessionLocal() as session:
-        yield session
-
-
-def caller_id(
-    x_exam_api_key: Annotated[str | None, Header()] = None,
-    x_user_id: Annotated[int | None, Header(gt=0)] = None,
-) -> int:
-    expected = os.getenv("EXAM_API_KEY")
-    if not expected:
-        raise HTTPException(503, "Exam API access is not configured.")
-    if not x_exam_api_key or not compare_digest(expected.encode(), x_exam_api_key.encode()):
-        raise HTTPException(401, "Invalid exam API key.")
-    if x_user_id is None:
-        raise HTTPException(400, "X-User-Id is required.")
-    return x_user_id
 
 
 def load_bank(session: Session, user_id: int, upload_id: int | None) -> list[Question]:
@@ -254,12 +151,8 @@ def public_paper(exam: Exam) -> ExamPaper:
     )
 
 
-@router.post("/generate", status_code=201, response_model=ExamPaper)
-def generate_exam(
-    request: GenerateExam,
-    user_id: Annotated[int, Depends(caller_id)],
-    session: Annotated[Session, Depends(get_session)],
-):
+
+def generate_exam(session: Session, user_id: int, request: GenerateExam) -> ExamPaper:
     if session.get(User, user_id) is None:
         raise HTTPException(404, "User not found.")
     counts = request.counts()
@@ -297,12 +190,7 @@ def generate_exam(
     return result
 
 
-@router.get("/{exam_id}", response_model=ExamPaper)
-def get_exam(
-    exam_id: int,
-    user_id: Annotated[int, Depends(caller_id)],
-    session: Annotated[Session, Depends(get_session)],
-):
+def get_exam(session: Session, user_id: int, exam_id: int) -> ExamPaper:
     exam = session.scalar(select(Exam).where(Exam.id == exam_id, Exam.user_id == user_id))
     if exam is None or exam.paper is None:
         raise HTTPException(404, "Generated paper not found.")

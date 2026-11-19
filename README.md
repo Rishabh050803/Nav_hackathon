@@ -22,8 +22,9 @@ Keep the same secret across restarts and workers; changing it invalidates tokens
 against this directory. Export environment variables explicitly; `.env` files
 are not automatically loaded. Interactive API documentation is at `/docs`.
 
-User registration, exam creation, PDF extraction, and a browser UI are outside
-this branch. Populate the existing `User`, `Exam`, `Question`, and `Option`
+User registration, PDF extraction, and a browser UI are outside this branch.
+Exam generation is implemented in `app/generation/`; see [Exam generation](EXAM_GENERATION.md)
+for its configuration and trusted-caller authentication headers. Populate the existing `User`, `Exam`, `Question`, and `Option`
 models through your existing workflow or a trusted local script first.
 
 ## Conduction rules
@@ -141,7 +142,8 @@ snapshots, worker lifecycle, and migration rollback/reapplication. The original
 schema and foreign-key tests are retained.
 
 Modules separate schemas, HTTP routing, state transitions, persistence,
-transactions, and the deadline worker under `app/conduction/`.
+transactions, and the deadline worker under `app/conduction/`. Generation has its
+own routing, schemas, services, dependencies, and model adapter under `app/generation/`.
 
 `tests/live_endpoints.py` starts a real local Uvicorn server against a temporary
 SQLite database and checks all 10 endpoint operations with 30 HTTP assertions.

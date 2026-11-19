@@ -58,10 +58,5 @@ class DatabaseTest(unittest.TestCase):
         command.check(config)
 
 
-def tearDownModule():
-    engine.dispose()
-    _temp.cleanup()
-
-
 if __name__ == '__main__':
     unittest.main()

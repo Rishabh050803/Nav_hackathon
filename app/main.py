@@ -1,14 +1,11 @@
 import asyncio
 from contextlib import asynccontextmanager, suppress
 
-from app.exams import router
-
-app = FastAPI(title="PrepX", description="Exam creation backend", version="0.2.0")
-app.include_router(router)
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from app.conduction.router import router
+from app.conduction.router import router as conduction_router
+from app.generation.router import router as generation_router
 from app.conduction.service import RuleError
 from app.conduction.worker import run
 
@@ -26,7 +23,8 @@ async def lifespan(app):
 
 app = FastAPI(title='PrepX', description='Exam creation and conduction backend',
               version='0.2.0', lifespan=lifespan)
-app.include_router(router)
+app.include_router(generation_router)
+app.include_router(conduction_router)
 
 
 @app.exception_handler(RuleError)
