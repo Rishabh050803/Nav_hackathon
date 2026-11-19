@@ -21,6 +21,10 @@ def main():
     with tempfile.TemporaryDirectory(prefix='prepx-live-') as directory:
         os.environ['DATABASE_URL'] = f'sqlite:///{directory}/live.db'
         os.environ['AUTH_TOKEN_SECRET'] = secrets.token_hex(32)
+        # Live smoke tests use deterministic fallback, never a paid model call.
+        for key in ('ANALYSIS_LLM_URL', 'ANALYSIS_LLM_MODEL', 'ANALYSIS_LLM_API_KEY',
+                    'EXAM_LLM_URL', 'EXAM_LLM_MODEL', 'EXAM_LLM_API_KEY'):
+            os.environ[key] = ''
         from alembic import command
         from alembic.config import Config
         import httpx
@@ -180,6 +184,20 @@ def main():
             request('POST', f"/api/attempts/{paused['id']}/resume", 409,
                     json={'version': paused['version']})
             print('PASS: expired pause auto-submits and prevents resume (deadline advanced in fixture)')
+            performance = request('GET', '/api/analysis/performance')
+            assert performance['submitted_exam_count'] == 3
+            assert performance['overall']['total_questions'] == 6
+            assert performance['overall']['correct_count'] == 1
+            assert performance['overall']['score_percent'] == 16.67
+            other_history = request('GET', '/api/analysis/performance',
+                                    headers={'Authorization': f'Bearer {other_token}'})
+            assert other_history['submitted_exam_count'] == 0
+            request('GET', '/api/analysis/performance', 401,
+                    headers={'Authorization': 'Bearer invalid'})
+            coaching = request('POST', '/api/analysis/suggestions')
+            assert coaching['source'] == 'rules' and coaching['fallback_reason'] == 'not_configured'
+            assert coaching['advice']['recommendations']
+            print('PASS: history statistics, coaching fallback, authentication, and history isolation')
             print(f'PASS: {checks} real HTTP response checks; temporary database only')
         finally:
             stop_server()
